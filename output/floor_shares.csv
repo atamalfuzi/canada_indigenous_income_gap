@@ -1,0 +1,33 @@
+year,outcome,sex,group,share
+2006,totinc,women,Indigenous,0.947314578005115
+2006,totinc,women,Comparison group,0.9577719355898785
+2006,totinc,men,Indigenous,0.9480894015861572
+2006,totinc,men,Comparison group,0.9772516136816071
+2006,wages,women,Indigenous,0.6592071611253197
+2006,wages,women,Comparison group,0.7399711281160509
+2006,wages,men,Indigenous,0.7183850036049028
+2006,wages,men,Comparison group,0.7975809857030824
+2011,totinc,women,Indigenous,0.9417853318278073
+2011,totinc,women,Comparison group,0.9579554797741228
+2011,totinc,men,Indigenous,0.9512942839339649
+2011,totinc,men,Comparison group,0.9786690685367555
+2011,wages,women,Indigenous,0.6359477039692681
+2011,wages,women,Comparison group,0.732267953182496
+2011,wages,men,Indigenous,0.7062675061827045
+2011,wages,men,Comparison group,0.7838328388995406
+2016,totinc,women,Indigenous,0.9460310505719102
+2016,totinc,women,Comparison group,0.97010680807046
+2016,totinc,men,Indigenous,0.9371906847726321
+2016,totinc,men,Comparison group,0.978967625868542
+2016,wages,women,Indigenous,0.661767489740362
+2016,wages,women,Comparison group,0.7582449130226387
+2016,wages,men,Indigenous,0.7194800388341259
+2016,wages,men,Comparison group,0.8046685095195641
+2021,totinc,women,Indigenous,0.9638625591954585
+2021,totinc,women,Comparison group,0.9799345797198626
+2021,totinc,men,Indigenous,0.9603233558088401
+2021,totinc,men,Comparison group,0.9842966904738392
+2021,wages,women,Indigenous,0.660655755174847
+2021,wages,women,Comparison group,0.7637609508092206
+2021,wages,men,Indigenous,0.7118504727235972
+2021,wages,men,Comparison group,0.8030770556071302

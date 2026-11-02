@@ -157,8 +157,9 @@ def adjusted_gap(d, year, label, outcome="totinc", sex="women", weighted=True):
     if weighted:
         estimate, se = replicate_se(gap_function(p), p, year)
         return {"check": label, "year": year, "outcome": outcome, "sex": sex, "adjusted": estimate.adjusted, "se": se.adjusted}
-    return {"check": label, "year": year, "outcome": outcome, "sex": sex,
-            "adjusted": gap_function(p)(p, np.ones(len(p))).adjusted, "se": np.nan}
+    x = np.column_stack([p.indigenous.to_numpy(float), control_matrix(p)[0]])
+    beta, robust, _ = hc1(p.y.to_numpy(), x)
+    return {"check": label, "year": year, "outcome": outcome, "sex": sex, "adjusted": beta[0], "se": robust[0]}
 
 
 def full_year_full_time(d, year):
@@ -168,18 +169,18 @@ def full_year_full_time(d, year):
 def sensitivity(d, year):
     rows = []
     for sex, flag in SEXES.items():
-        women_or_men = d[d.female == flag]
+        people = d[d.female == flag]
         for outcome in OUTCOMES:
-            s = with_outcome(women_or_men, outcome)
+            s = with_outcome(people, outcome)
             rows.append(adjusted_gap(s, year, "Unweighted", outcome, sex, weighted=False))
             rows.append(adjusted_gap(s[s.agegrp.isin(COHORT[year])], year, "Same birth years (aged 25 to 44 in 2006)", outcome, sex))
             if year == 2006:
                 rows.append(adjusted_gap(s[~((s.aboid == 6) & s.ethder.isin((48, 49, 50)))], year,
                                          "Mixed Indigenous ancestry out of the comparison group", outcome, sex))
-        rows.append(adjusted_gap(with_outcome(women_or_men[full_year_full_time(women_or_men, year)], "wages"), year,
+        rows.append(adjusted_gap(with_outcome(people[full_year_full_time(people, year)], "wages"), year,
                                  "Full-year, full-time workers", "wages", sex))
         if year == 2021:
-            less = women_or_men.assign(no_covid=women_or_men.totinc - women_or_men.covid_erb)
+            less = people.assign(no_covid=people.totinc - people.covid_erb)
             rows.append(adjusted_gap(with_outcome(less, "no_covid"), year, "Total income less pandemic benefits", "totinc", sex))
     return rows
 
@@ -195,6 +196,29 @@ def floor_shares(d, year):
                 rows.append({"year": year, "outcome": outcome, "sex": sex, "group": group,
                              "share": (above * s.weight)[members].sum() / s.weight[members].sum()})
     return rows
+
+
+def pandemic_benefits(d):
+    """In 2021, who had a benefit and how much of total income it was, among people with the $1,000 floor met."""
+    rows = []
+    for sex, flag in SEXES.items():
+        s = pooled(with_outcome(d[d.female == flag], "totinc"))
+        for group, members in (("Indigenous", s.indigenous), ("Comparison group", ~s.indigenous)):
+            m = s[members]
+            rows.append({"sex": sex, "group": group, "share_with_benefit": (m.weight * (m.covid_erb > 1)).sum() / m.weight.sum(),
+                         "benefit_share_of_income": (m.weight * m.covid_erb).sum() / (m.weight * m.totinc).sum()})
+    return pd.DataFrame(rows)
+
+
+def groups_less_benefits(d):
+    """The group gaps in 2021 with pandemic benefits taken out of total income."""
+    rows = []
+    for sex, flag in SEXES.items():
+        s = d[d.female == flag]
+        s = with_outcome(s.assign(no_covid=s.totinc - s.covid_erb), "no_covid")
+        estimate, se = replicate_se(group_function(s), s, 2021)
+        rows += [{"sex": sex, "group": g, "gap": estimate[g], "se": se[g]} for g in GROUPS]
+    return pd.DataFrame(rows)
 
 
 def cohort_counts(everyone, year):
@@ -246,6 +270,9 @@ def run(root=RAW):
         checks += sensitivity(d, year)
         floors += floor_shares(d, year)
         cohorts += cohort_counts(everyone, year)
+        if year == 2021:
+            pandemic_benefits(d).to_csv(OUTPUT / "pandemic_benefits.csv", index=False)
+            groups_less_benefits(d).to_csv(OUTPUT / "group_gaps_less_benefits.csv", index=False)
     gaps, checks = pd.DataFrame(gaps), pd.DataFrame(checks)
     cohorts = pd.DataFrame(cohorts)
     cohorts["ratio_to_2006"] = cohorts["count"] / cohorts.groupby("group")["count"].transform("first")
