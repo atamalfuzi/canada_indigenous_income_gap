@@ -1,6 +1,6 @@
 # Proposed site text
 
-For the session that integrates the website. Nothing here has been added to the site. The repository is not public yet, so the code link will not work until it is.
+For the session that integrates the website. Nothing here has been added to the site.
 
 ## Portfolio entry
 
