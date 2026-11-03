@@ -29,7 +29,12 @@ def save(fig, name, title, subtitle, caption):
     plt.close(fig)
 
 
-def panels(height=8.2, top=0.86, bottom=0.235):
+def percent(log_gap):
+    """A gap in logs as a per cent difference: -0.15 becomes -13.9."""
+    return 100 * np.expm1(log_gap)
+
+
+def panels(height=8.2, top=0.86, bottom=0.235, ylabel="Per cent difference"):
     """Women and men across, total income and wages down, on one scale."""
     fig, axes = plt.subplots(2, 2, figsize=(10, height), sharex=True, sharey=True)
     fig.subplots_adjust(left=0.085, right=0.975, top=top, bottom=bottom, hspace=0.16, wspace=0.07)
@@ -37,7 +42,7 @@ def panels(height=8.2, top=0.86, bottom=0.235):
         axes[i, j].set_title(f"{OUTCOMES[outcome]}, {sex}", loc="left", fontweight="bold")
         axes[i, j].axhline(0, color=MUTED, lw=1)
     for i in range(2):
-        axes[i, 0].set_ylabel("Log points")
+        axes[i, 0].set_ylabel(ylabel)
     return fig, axes
 
 
@@ -46,9 +51,10 @@ def cell(axes, outcome, sex):
 
 
 def line(ax, t, y, se, colour, label):
-    """A line with two standard errors at each point. The 2011 point is hollow because it comes from a voluntary survey."""
-    ax.errorbar(t.year, t[y], yerr=2 * t[se], color=colour, lw=2, capsize=0, elinewidth=1, label=label, zorder=2)
-    ax.scatter(t.year, t[y], s=45, color=[("white" if x == 2011 else colour) for x in t.year], edgecolor=colour, linewidth=1.6, zorder=3)
+    """A line in per cent with two standard errors at each point. The 2011 point is hollow because it comes from a voluntary survey."""
+    middle, low, high = percent(t[y]), percent(t[y] - 2 * t[se]), percent(t[y] + 2 * t[se])
+    ax.errorbar(t.year, middle, yerr=[middle - low, high - middle], color=colour, lw=2, capsize=0, elinewidth=1, label=label, zorder=2)
+    ax.scatter(t.year, middle, s=45, color=[("white" if x == 2011 else colour) for x in t.year], edgecolor=colour, linewidth=1.6, zorder=3)
 
 
 def gaps():
@@ -56,26 +62,26 @@ def gaps():
     fig, axes = panels()
     for (outcome, sex), t in g.groupby(["outcome", "sex"]):
         ax = cell(axes, outcome, sex)
-        line(ax, t, "raw", "raw_se", ORANGE, "Raw gap")
-        line(ax, t, "adjusted", "adjusted_se", BLUE, "With the same age, education, language, marital status, area and household size")
+        line(ax, t, "raw", "raw_se", ORANGE, "All people")
+        line(ax, t, "adjusted", "adjusted_se", BLUE, "People with the same age, education, language, marital status, area and household size")
     for sex in SEXES:
         row = checks[(checks.check == "Total income less pandemic benefits") & (checks.sex == sex)].iloc[0]
         ax = cell(axes, "totinc", sex)
-        ax.scatter(2021, row.adjusted, marker="D", s=40, color=MAGENTA, zorder=4, label="Adjusted, total income less pandemic benefits")
+        ax.scatter(2021, percent(row.adjusted), marker="D", s=40, color=MAGENTA, zorder=4, label="Same characteristics, total income less pandemic benefits")
     ax = axes[0, 1]
     handles, labels = ax.get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower left", bbox_to_anchor=(0.075, 0.095), ncol=1, labelcolor=MUTED, fontsize=9.5, handlelength=1.4, borderaxespad=0)
     for ax in axes.flat:
         ax.set_xticks(YEARS)
-    save(fig, "gaps.png", "The adjusted gap narrowed for men; for women it moved mostly in 2021",
-         "Average log income, people with Indigenous identity or registered status less the comparison group",
-         f"{SAMPLE} Income of $1,000 or more. Bars are two standard errors. The hollow 2011 point is a voluntary survey. "
+    save(fig, "gaps.png", "The gap narrowed for men; for women it moved mostly in 2021",
+         "How much lower Indigenous people's income and wages are than the comparison group's, in per cent",
+         f"{SAMPLE} Income of $1,000 or more. Vertical bars show the margin of error, two standard errors either way. The hollow 2011 point is a voluntary survey. "
          f"The people reporting an identity changed across these years, so this is not one group followed over time. {SOURCE}")
 
 
 def decomposition():
     g = pd.read_csv(OUTPUT / "gaps.csv")
-    fig, axes = panels(bottom=0.19)
+    fig, axes = panels(bottom=0.19, ylabel="Log points (−0.1 is about 10% lower)")
     for (outcome, sex), t in g.groupby(["outcome", "sex"]):
         ax = cell(axes, outcome, sex)
         ax.bar(t.year, t.explained, width=3.2, color=BLUE, edgecolor="white", linewidth=1.5, label="Accounted for by the measured characteristics")
@@ -108,7 +114,7 @@ def characteristics():
         ax.set_yticks(positions, [f.capitalize() for f in families])
         ax.grid(axis="y", visible=False)
     for ax in axes[1]:
-        ax.set_xlabel("Log points of the raw gap")
+        ax.set_xlabel("Log points (−0.1 is about 10% lower)")
     handles, labels = axes[0, 0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower left", bbox_to_anchor=(0.14, 0.1), ncol=2, labelcolor=MUTED, handlelength=1.4, borderaxespad=0)
     save(fig, "characteristics.png", "Education is the largest measured difference in every panel",
@@ -127,13 +133,13 @@ def groups():
         ax = cell(axes, outcome, sex)
         for group, (label, colour) in shown.items():
             one = part[part.group == group]
-            ax.plot(one.year, one.gap, color=colour, lw=2, label=label, zorder=2)
-            ax.scatter(one.year, one.gap, s=38, color=[("white" if x == 2011 else colour) for x in one.year], edgecolor=colour, linewidth=1.6, zorder=3)
+            ax.plot(one.year, percent(one.gap), color=colour, lw=2, label=label, zorder=2)
+            ax.scatter(one.year, percent(one.gap), s=38, color=[("white" if x == 2011 else colour) for x in one.year], edgecolor=colour, linewidth=1.6, zorder=3)
         ax.set_xticks(YEARS)
     handles, labels = axes[0, 0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower left", bbox_to_anchor=(0.075, 0.1), ncol=3, labelcolor=MUTED, fontsize=9.5, handlelength=1.4, borderaxespad=0)
-    save(fig, "groups.png", "The largest adjusted gaps are among registered men who are band members",
-         "Adjusted gap against the comparison group, by group. Same regression, all groups entered together.",
+    save(fig, "groups.png", "The largest gaps are among registered men who are band members",
+         "Per cent difference from the comparison group with the same measured characteristics, by group",
          f"{SAMPLE} Standard errors are in output/group_gaps.csv and are large for the smaller groups. The public file cannot "
          f"say who lives on reserve. The hollow 2011 point is a voluntary survey. {SOURCE}")
 

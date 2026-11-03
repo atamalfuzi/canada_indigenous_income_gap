@@ -4,11 +4,11 @@ For the session that integrates the website. Nothing here has been added to the 
 
 ## Portfolio entry
 
-**Title:** The Indigenous income gap in Canada across four censuses, and what can be said about it
+**Title:** The Indigenous income gap in Canada, 2006 to 2021
 
 **Type and year:** Open data analysis in Python, 2026
 
-**Text:** An extension of a graduate econometrics assignment from the 2006 Census to 2021, on Statistics Canada's public microdata. Among people with the same measured characteristics, the wage gap narrowed from about 25% to about 14% for men and from about 10% to about 4% for women. The people counted as Indigenous also changed across these files, so this is not one group followed over time, and the write-up measures how far that could matter.
+**Text:** A graduate econometrics assignment from Simon Fraser University, carried forward from the 2006 Census to 2021 with Statistics Canada's public microdata. Comparing people with the same age, education and other measured characteristics, Indigenous men's wages went from about 25% lower to about 14% lower, and Indigenous women's from about 10% lower to about 4% lower. The people counted as Indigenous also changed between censuses, so this is not one group followed over time, and the write-up measures how much that could matter.
 
 **Links:** Project page, and code at https://github.com/atamalfuzi/canada_indigenous_income_gap
 
@@ -16,41 +16,43 @@ For the session that integrates the website. Nothing here has been added to the 
 
 ### Summary
 
-I compare the income and wages of Indigenous and non-Indigenous Canadians with the same age group, education, official languages, marital status, area and household size, in four files: the 2006 Census, the 2011 National Household Survey, and the 2016 and 2021 Censuses. The sample is Canadian citizens by birth aged 25 to 64. It starts by reproducing a course assignment that applied Pendakur and Pendakur (2011) to 2006.
+How much lower are the incomes and wages of Indigenous people in Canada than those of other Canadians with the same age, education, language, marital status, area and household size? And how did that change? I look at four rounds of census data: 2006, 2011, 2016 and 2021, for Canadian citizens by birth aged 25 to 64.
 
-This describes a gap and what it is correlated with in these files. It does not identify causes.
+The project started as an assignment in a graduate applied econometrics course at Simon Fraser University, which applied the method of Pendakur and Pendakur (2011) to the 2006 Census. I reproduce that work in Python first, then carry it forward.
 
-### How the gap changed
+The results describe a gap and what goes with it. They don't show what causes it.
+
+### The gap narrowed
 
 Figure: `figures/gaps.png`
 
-Among men, the adjusted wage gap went from −0.287 log points in 2006 to −0.152 in 2021. Among women, it went from −0.107 to −0.043, most of that in the last step. The direction agrees with Pendakur and Pendakur's later work on the full census files.
+Comparing people with the same measured characteristics, Indigenous men's wages were about 25% lower in 2006 and 14% lower in 2021. Indigenous women's were about 10% lower and 4% lower. Most of the change for men came by 2016, and most of the change for women came in 2021. A later paper by Pendakur and Pendakur, using the full census files, finds the same direction.
 
-### What observed characteristics account for
+### What measured characteristics account for
 
 Figures: `figures/decomposition.png`, then `figures/characteristics.png`
 
-A decomposition puts the share of the raw wage gap accounted for by measured characteristics at 31% to 54% among men and 62% to 80% among women, depending on the year and whose coefficients are used. Education is the largest part. The rest is not a measure of any one cause, and the measured characteristics can themselves reflect earlier disadvantage.
+Differences in age, education and the other measured characteristics account for roughly a third to a half of the wage gap among men and roughly 60% or more among women. Education is the largest part. The rest of the gap is not a measure of any one cause, and the measured characteristics can themselves reflect earlier disadvantage.
 
 ### The average covers very different groups
 
 Figure: `figures/groups.png`
 
-The largest gaps are among registered men who are band members: −0.50 in wages in 2006 and −0.30 in 2021. The public files have no on-reserve variable, so this is not a statement about reserves. The assignment's labels had suggested it was, and that is corrected here.
+The largest gaps are among registered men who are members of a First Nation or band: about 39% lower wages in 2006 and 26% lower in 2021. The public files can't say who lives on reserve, so this is not a statement about reserves. The original assignment had labelled these groups as if it were, and that is corrected here.
 
 ### 2021 and the pandemic
 
-Income in the 2021 file is from 2020 and includes pandemic benefits, which more Indigenous people received. Taking them out moves the adjusted total income gap for men from −0.158 to −0.243, so total income in 2021 should not be read as a new level.
+Income in the 2021 Census is from 2020 and includes pandemic benefits, which more Indigenous people received. Taking them out removes about two thirds of the narrowing in men's total income between 2016 and 2021, so 2021 should not be read as a new normal.
 
 ### Whether these are the same people
 
 Figure: `figures/identity.png`
 
-People aged 25 to 44 in 2006 are counted again at each later census. The comparison group shrinks by 4% by 2021, while the Indigenous group in the same birth years grows by 28%. Changes in reporting, law and coverage cannot be separated here. If every net addition had the comparison group's income, the wage gap among men in these birth years would still narrow, from −0.336 to −0.187, but this uses net change only and is not a true bound.
+Following people born in the same years, the comparison group shrinks by about 4% by 2021, as expected. The Indigenous group in the same birth years grows by 28%, because more people report an Indigenous identity or registered status over time. Even if everyone added had the comparison group's income, the men's wage gap in these birth years would still narrow, from 29% to 17%. That is a rough check, not a firm bound.
 
 ### Notes for the page
 
 - Use the "Personal project" disclaimer from the README.
-- Keep the statement that the results describe correlates and not causes, and the first limit from the README, wherever a number from this project is quoted.
+- Wherever a number from this project is quoted, keep the statement that the results describe a gap and not its causes, and the caution that the people counted as Indigenous change between censuses.
 - Use Indigenous, First Nations, Métis and Inuit in site text. "Aboriginal" appears only in the titles of older sources.
-- The tables in the README can be reused as they are. The source numbers are in `output/`.
+- The tables in the README can be reused as they are. The source numbers are in `output/`, in log points.
