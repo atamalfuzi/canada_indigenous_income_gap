@@ -69,7 +69,7 @@ def test_2021_uses_gender_and_other_years_use_sex():
 
 
 def test_area_keeps_large_areas_and_groups_the_rest():
-    assert data.area(pd.Series([535, 421, 999, 988])).tolist() == [535, 30, 999, 30]  # Quebec City is in the group, as in A1b
+    assert data.area(pd.Series([535, 421, 999, 988])).tolist() == [535, 30, 999, 30]  # Quebec City is in the group, as in the 2006 analysis
 
 
 def test_income_missing_codes_become_missing():
@@ -91,7 +91,7 @@ def test_covid_benefit_code_reads_as_none_and_not_available_stays_missing():
     assert np.isnan(d.covid_erb.iloc[2])
 
 
-def test_sample_applies_the_a1b_conditions():
+def test_sample_applies_the_2006_conditions():
     d = data.harmonise(raw_frame(2016, CITIZEN=[1, 2, 1, 1, 1, 1], AGEGRP=[9, 9, 8, 17, 16, 16], KOL=[1, 1, 1, 1, 4, 3],
                                  HDGREE=[1, 1, 1, 1, 1, 88], HHSIZE=[7, 7, 7, 7, 7, 8]), 2016)
     assert data.sample(d).index.tolist() == [0]

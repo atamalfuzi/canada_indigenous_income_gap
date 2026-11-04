@@ -1,10 +1,10 @@
-"""Reproduce the 2006 regressions from A1b, estimate the gap in every year, and write every table the README quotes to output/."""
+"""Reproduce the earlier 2006 regressions, estimate the gap in every year, and write every table the README quotes to output/."""
 import numpy as np
 import pandas as pd
 
 from data import NOT_AVAILABLE, OUTPUT, RAW, REPLICATES, YEARS, harmonise, read_year, sample
 
-FLOOR = 100  # dollars, from A1b. Income is rounded to $1,000 in all four files, so this keeps $1,000 and above.
+FLOOR = 100  # dollars, from the 2006 analysis. Income is rounded to $1,000 in all four files, so this keeps $1,000 and above.
 OUTCOMES = {"totinc": "Total income", "wages": "Wages"}
 SEXES = {"women": True, "men": False}
 CONTROLS = {"age": "agegrp", "education": "education", "language": "kol", "marital status": "marital", "area": "area",
@@ -19,7 +19,7 @@ COHORT_GROUPS = {"Indigenous identity or registered": "indigenous", "Registered"
                  "First Nations, not registered": "first_nations", "Métis, not registered": "metis",
                  "Inuit, not registered": "inuit", "Comparison group": "comparison"}
 
-# A1b_results.pdf: coefficient and standard error, in the order of GROUPS with multiple ancestry added at the end.
+# The 2006 analysis's results: coefficient and standard error, in the order of GROUPS with multiple ancestry added at the end.
 PUBLISHED = {
     ("totinc", "women"): (170701, .1592, [(-.140855, .016044), (-.117455, .058394), (-.098363, .030906), (-.086033, .018917),
                                           (.210371, .055044), (-.326923, .114456), (-.139551, .042507), (-.064978, .014578)]),
@@ -107,21 +107,21 @@ def other_weights(d):
 
 
 def group_function(d):
-    """The A1b indicators together, with the controls."""
+    """The 2006 analysis's indicators together, with the controls."""
     x, _ = control_matrix(d)
     x = np.column_stack([d[list(GROUPS)].to_numpy(float), x])
     y = d.y.to_numpy()
     return lambda _, w: pd.Series(wls(y[w > 0], x[w > 0], w[w > 0])[:len(GROUPS)], index=list(GROUPS))
 
 
-def a1b_regressions(d):
-    """A1b as written on the 2006 file: unweighted, with legal marital status and detailed origins."""
+def regressions_2006(d):
+    """The 2006 analysis as written on the 2006 file: unweighted, with legal marital status and detailed origins."""
     rows = []
-    a1b = d.assign(multiple=(d.aboid == 6) & d.ethder.isin((48, 49, 50)),
+    d06 = d.assign(multiple=(d.aboid == 6) & d.ethder.isin((48, 49, 50)),
                    origin=d.ethder.where((d.aboid == 6) & d.ethder.between(10, 46), 0).astype(int))
     for outcome in OUTCOMES:
         for sex, flag in SEXES.items():
-            s = with_outcome(a1b[a1b.female == flag], outcome)
+            s = with_outcome(d06[d06.female == flag], outcome)
             controls = [dummies(s[c].astype(int).rename(c)) for c in ("agegrp", "education", "kol", "marst_legal", "area", "hhsize", "origin")]
             names = [*GROUPS, "multiple"]
             x = np.column_stack([s[names].to_numpy(float), np.ones(len(s)), *[c.to_numpy() for c in controls]])
@@ -263,7 +263,7 @@ def run(root=RAW):
         everyone = harmonise(read_year(year, root), year)
         d = sample(everyone)
         if year == 2006:
-            a1b_regressions(d).to_csv(OUTPUT / "reproduction_2006.csv", index=False)
+            regressions_2006(d).to_csv(OUTPUT / "reproduction_2006.csv", index=False)
         g, grp = year_tables(d, year)
         gaps += g
         groups += grp

@@ -8,7 +8,7 @@ For the session that integrates the website. Nothing here has been added to the 
 
 **Type and year:** Open data analysis in Python, 2026
 
-**Text:** A graduate econometrics assignment from Simon Fraser University, carried forward from the 2006 Census to 2021 with Statistics Canada's public microdata. Comparing people with the same age, education and other measured characteristics, Indigenous men's wages went from about 25% lower to about 14% lower, and Indigenous women's from about 10% lower to about 4% lower. The people counted as Indigenous also changed between censuses, so this is not one group followed over time, and the write-up measures how much that could matter.
+**Text:** How the income and wage gap changed from the 2006 Census to 2021, with Statistics Canada's public microdata. Comparing people with the same age, education and other measured characteristics, Indigenous men's wages went from about 25% lower to about 14% lower, and Indigenous women's from about 10% lower to about 4% lower. The people counted as Indigenous also changed between censuses, so this is not one group followed over time, and the write-up measures how much that could matter.
 
 **Links:** Project page, and code at https://github.com/atamalfuzi/canada_indigenous_income_gap
 
@@ -18,7 +18,7 @@ For the session that integrates the website. Nothing here has been added to the 
 
 How much lower are the incomes and wages of Indigenous people in Canada than those of other Canadians with the same age, education, language, marital status, area and household size? And how did that change? I look at four rounds of census data: 2006, 2011, 2016 and 2021, for Canadian citizens by birth aged 25 to 64.
 
-The project started as an assignment in a graduate applied econometrics course at Simon Fraser University, which applied the method of Pendakur and Pendakur (2011) to the 2006 Census. I reproduce that work in Python first, then carry it forward.
+The project starts from an earlier analysis of mine that applied the method of Pendakur and Pendakur (2011) to the 2006 Census. I reproduce that work in Python first, then carry it forward.
 
 The results describe a gap and what goes with it. They don't show what causes it.
 
@@ -38,7 +38,7 @@ Differences in age, education and the other measured characteristics account for
 
 Figure: `figures/groups.png`
 
-The largest gaps are among registered men who are members of a First Nation or band: about 39% lower wages in 2006 and 26% lower in 2021. The public files can't say who lives on reserve, so this is not a statement about reserves. The original assignment had labelled these groups as if it were, and that is corrected here.
+The largest gaps are among registered men who are members of a First Nation or band: about 39% lower wages in 2006 and 26% lower in 2021. The public files can't say who lives on reserve, so this is not a statement about reserves. My earlier analysis had labelled these groups as if it were, and that is corrected here.
 
 ### 2021 and the pandemic
 

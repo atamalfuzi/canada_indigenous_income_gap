@@ -44,7 +44,7 @@ LAYOUTS = {
 COLUMNS_2021 = ["ABOID", "AGEGRP", "BFNMEMB", "CITIZEN", "CMA", "COVID_ERB", "ETHDER", "FPTWK", "GENDER", "HDGREE", "HHSIZE",
                 "KOL", "MARSTH", "REGIND", "TOTINC", "WAGES", "WEIGHT", "WKSWRK", *wts(2021, 0, 0)]
 
-# The census metropolitan areas A1b kept as their own categories. The other named areas form one group, as does 999.
+# The census metropolitan areas the 2006 analysis kept as their own categories. The other named areas form one group, as does 999.
 LARGE_CMA = {205, 462, 505, 535, 537, 602, 799, 825, 835, 933, 935}
 NOT_CMA = 999
 # ETHDER codes for Indigenous origins with no other origin reported. The list of origins differs every year.
@@ -99,7 +99,7 @@ def harmonise(raw, year):
         else {1: "divorced", 2: "couple", 3: "separated", 4: "never", 5: "widowed"}
     d["marital"] = raw.MARSTH.map(marital)
     d["area"] = area(raw.CMA)
-    d["education"] = raw.HDGREE.where(raw.HDGREE != 4, 3)  # trades and apprenticeship together, as in A1b
+    d["education"] = raw.HDGREE.where(raw.HDGREE != 4, 3)  # trades and apprenticeship together, as in the 2006 analysis
     d["ancestry_only"] = raw.ETHDER.isin(INDIGENOUS_ORIGINS[year]) & (raw.ABOID == 6)
     if year == 2006:
         d["marst_legal"] = raw.MARST
@@ -118,7 +118,7 @@ def area(cma):
 
 
 def groups(d):
-    """The indicators in A1b. Someone with more than one identity and no registered status has each one set."""
+    """The indicators in the 2006 analysis. Someone with more than one identity and no registered status has each one set."""
     r, a = d.registered, d.aboid
     return pd.DataFrame({"registered_band": r & d.band, "registered_no_band": r & ~d.band,
                          "first_nations": ~r & a.isin((1, 4)), "metis": ~r & a.isin((2, 4)), "inuit": ~r & a.isin((3, 4)),

@@ -100,7 +100,7 @@ def test_changes_add_standard_errors_in_quadrature():
 
 
 @pytest.mark.skipif(not (OUTPUT / "reproduction_2006.csv").exists(), reason="run estimate.py first")
-def test_reproduction_stays_close_to_the_coursework():
+def test_reproduction_stays_close_to_the_2006_results():
     t = pd.read_csv(OUTPUT / "reproduction_2006.csv")
     assert len(t) == 32
     assert t.difference_in_se.abs().max() < .5
